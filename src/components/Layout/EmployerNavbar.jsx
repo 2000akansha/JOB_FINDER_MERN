@@ -48,7 +48,7 @@ const EmployerNavbar = () => {
             </Link>
           </li>
           <li>
-            <Link to={"/applications/me"} onClick={() => setShow(false)}>
+            <Link to={"/applications/employer"} onClick={() => setShow(false)}>
               APPLICANT'S APPLICATIONS
             </Link>
           </li>
