@@ -20,6 +20,7 @@ const Login = () => {
       const { data } = await axios.post(
         "http://127.0.0.1:4000/api/v1/user2/login2",
         { email, password, role },
+      
         {
           headers: {
             "Content-Type": "application/json",
@@ -27,6 +28,7 @@ const Login = () => {
           withCredentials: true,
         }
       );
+      console.log(email, password, role)
       toast.success(data.message);
       
       // Set token in context
@@ -88,7 +90,7 @@ const Login = () => {
             <button type="submit" onClick={handleLogin}>
               Login
             </button>
-            <Link to={"/register"}>Register Now</Link>
+            <Link to={"/register2"}>Register Now</Link>
           </form>
         </div>
         <div className="banner">
