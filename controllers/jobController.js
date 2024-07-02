@@ -1,4 +1,4 @@
-import { catchAsyncErrors } from "../middlewares/catchAsyncerror.js";
+import { catchAsyncErrors } from "../middlewares/catchAsyncerror.js"
 import { Job } from "../models/jobSchema.js";
 import ErrorHandler from "../middlewares/error.js";
 
@@ -11,16 +11,10 @@ export const getAllJobs = catchAsyncErrors(async (req, res, next) => {
 });
 
 export const postJob = catchAsyncErrors(async (req, res, next) => {
-  // Check if req.user exists and has the 'role' property
-  if (!req.user || !req.user.role) {
-    return next(new ErrorHandler("User not authorized.", 401));
-  }
   const { role } = req.user;
-  
-  // Check if the user is an employer
-  if (role !== "Employer") {
+  if (role === "Job Seeker") {
     return next(
-      new ErrorHandler("Only employers are allowed to post jobs.", 403)
+      new ErrorHandler("Job Seeker not allowed to access this resource.", 400)
     );
   }
   const {
@@ -127,7 +121,7 @@ export const deleteJob = catchAsyncErrors(async (req, res, next) => {
     success: true,
     message: "Job Deleted!",
   });
-});
+}); 
 
 export const getSingleJob = catchAsyncErrors(async (req, res, next) => {
   const { id } = req.params;
@@ -141,6 +135,6 @@ export const getSingleJob = catchAsyncErrors(async (req, res, next) => {
       job,
     });
   } catch (error) {
-    return next(new ErrorHandler(`Invalid ID / CastError`, 404));
+    return next(new ErrorHandler(`bro yaha bhasadd horhi hai`, 404));
   }
 });
