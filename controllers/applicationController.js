@@ -1,3 +1,90 @@
+// import { catchAsyncErrors } from "../middlewares/catchAsyncError.js";
+// import ErrorHandler from "../middlewares/error.js";
+// import { Application } from "../models/applicationSchema.js";
+// import { Job } from "../models/jobSchema.js";
+// import cloudinary from "cloudinary";
+
+// export const postApplication = catchAsyncErrors(async (req, res, next) => {
+//   if (!req.user || !req.user.role) {
+//     return next(new ErrorHandler("User not authorized.", 401));
+//   }
+//   const { role } = req.user;
+  
+//   // Check if the user is an employer
+//   if (role !== "Job Seeker") {
+//     return next(
+//       new ErrorHandler("Only Job Seeker are allowed to apply for jobs.", 403)
+//     );
+//   }
+
+//   const { resume } = req.files;
+//   const allowedFormats = ["image/png", "image/jpeg", "image/webp"];
+//   if (!allowedFormats.includes(resume.mimetype)) {
+//     return next(
+//       new ErrorHandler("Invalid file type. Please upload a PNG file.", 400)
+//     );
+//   }
+//   const cloudinaryResponse = await cloudinary.uploader.upload(
+//     resume.tempFilePath
+//   );
+
+//   if (!cloudinaryResponse || cloudinaryResponse.error) {
+//     console.error(
+//       "Cloudinary Error:",
+//       cloudinaryResponse.error || "Unknown Cloudinary error"
+//     );
+//     return next(new ErrorHandler("Failed to upload Resume to Cloudinary", 500));
+//   }
+//   const { name, email, coverLetter, phone, address, jobId } = req.body;
+//   const applicantID = {
+//     user: req.user._id,
+//     role: "Job Seeker",
+//   };
+//   if (!jobId) {
+//     return next(new ErrorHandler("Job not found!", 404));
+//   }
+//   const jobDetails = await Job.findById(jobId);
+//   if (!jobDetails) {
+//     return next(new ErrorHandler("Job not found!", 404));
+//   }
+
+//   const employerID = {
+//     user: jobDetails.postedBy,
+//     role: "Employer",
+//   };
+//   if (
+//     !name ||
+//     !email ||
+//     !coverLetter ||
+//     !phone ||
+//     !address ||
+//     !applicantID ||
+//     !employerID ||
+//     !resume
+//   ) {
+//     return next(new ErrorHandler("Please fill all fields.", 400));
+//   }
+//   const application = await Application.create({
+//     name,
+//     email,
+//     coverLetter,
+//     phone,
+//     address,
+//     applicantID,
+//     employerID,
+//     resume: {
+//       public_id: cloudinaryResponse.public_id,
+//       url: cloudinaryResponse.secure_url,
+//     },
+//   });
+//   res.status(200).json({
+//     success: true,
+//     message: "Application Submitted!",
+//     application,
+//   });
+// });
+
+
 import jwt from "jsonwebtoken";
 import {Job} from "../models/jobSchema.js"
 import {Application} from "../models/applicationSchema.js"
@@ -76,6 +163,33 @@ export const postApplication = catchAsyncErrors(async (req, res, next) => {
 });
 
 
+// export const employerGetAllApplications = catchAsyncErrors(async (req, res, next) => {
+//   // Check if user is authenticated
+//   if (!req.user) {
+//     return next(new ErrorHandler("User not authenticated.", 401));
+//   }
+
+//   // Verify user role
+//   const { role, _id } = req.user;
+//   if (role !== "Employer") {
+//     return next(new ErrorHandler("Only employers are allowed to access this resource.", 403));
+//   }
+
+//   try {
+//     // Fetch applications for the authenticated employer
+//     const applications = await Application.find({ "employerID.user": _id });
+
+//     res.status(200).json({
+//       success: true,
+//       applications,
+//     });
+//   } catch (error) {
+//     // Handle any database or server errors
+//     return next(new ErrorHandler("Failed to fetch applications.", 500));
+//   }
+// });
+
+
 export const employerGetAllApplications = catchAsyncErrors(async (req, res, next) => {
   // Check if user is authenticated
   if (!req.user) {
@@ -102,49 +216,7 @@ export const employerGetAllApplications = catchAsyncErrors(async (req, res, next
   }
 });
 
-// export const employerGetAllApplications = catchAsyncErrors(async (req, res, next) => {
-//   // Check if user is authenticated
-//   if (!req.user) {
-//     const authError = new ErrorHandler("User not authenticated.", 401);
-//     console.error(authError.message);
-//     return next(authError);
-//   }
 
-//   // Verify user role and get the employer ID
-//   const { role, _id } = req.user;
-//   if (role !== "Employer") {
-//     const roleError = new ErrorHandler("Only employers are allowed to access this resource.", 403);
-//     console.error(roleError.message);
-//     return next(roleError);
-//   }
-
-//   try {
-//     // Fetch jobs posted by the authenticated employer
-//     const postedJobs = await Job.find({ employer: _id });
-//     console.log("Posted jobs:", postedJobs);
-
-//     // Check if any jobs are posted by the employer
-//     if (postedJobs.length === 0) {
-//       throw new ErrorHandler("No jobs posted by the authenticated employer.", 404);
-//     }
-
-//     // Extract job IDs from posted jobs
-//     const jobIds = postedJobs.map(job => job._id);
-//     console.log("Job IDs:", jobIds);
-
-//     // Fetch applications for the posted jobs
-//     const applications = await Application.find({ jobId: { $in: jobIds } });
-//     console.log("Applications:", applications);
-
-//     res.status(200).json({
-//       success: true,
-//       applications,
-//     });
-//   } catch (error) {
-//     console.error("Failed to fetch applications:", error);
-//     return next(new ErrorHandler("Failed to fetch applications.", 500));
-//   }
-// });
 
 export const jobseekerGetAllApplications = catchAsyncErrors(
   async (req, res, next) => {
