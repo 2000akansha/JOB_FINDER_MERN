@@ -16,7 +16,7 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-   
+   console.log(email, password, role );
     try {
       const { data } = await axios.post(
         "http://127.0.0.1:4000/api/v1/user1/login1",
@@ -95,7 +95,7 @@ const Login = () => {
             <button type="submit" onClick={handleLogin}>
               Login
             </button>
-            <Link to={"/register"}>Register Now</Link>
+            <Link to={"/register1"}>Register Now</Link>
           </form>
         </div>
         <div className="banner">
