@@ -8,10 +8,13 @@ const PostJob = () => {
   const { isAuthorized, user } = useContext(Context);
   const navigateTo = useNavigate();
 
-  // Redirect if user is not authorized or is not an employer
+  // Logging context values and navigation status
   useEffect(() => {
-    if (!isAuthorized || (user && user.role !== "Employer")) {
-      navigateTo("/");
+    console.log("Authorization status:", isAuthorized);
+    console.log("User from context:", user);
+    if (!isAuthorized ) {
+      console.log("Redirecting to /login1");
+      navigateTo("/login1");
     }
   }, [isAuthorized, navigateTo, user]);
 
@@ -30,6 +33,21 @@ const PostJob = () => {
   // Function to handle job post
   const handleJobPost = async (e) => {
     e.preventDefault();
+
+    // Log form data before sending
+    console.log("Posting job with data:", {
+      title,
+      description,
+      category,
+      country,
+      city,
+      location,
+      salaryFrom,
+      salaryTo,
+      fixedSalary,
+      salaryType
+    });
+
     if (salaryType === "Fixed Salary") {
       setSalaryFrom("");
       setSalaryTo("");
@@ -40,10 +58,11 @@ const PostJob = () => {
       setSalaryTo("");
       setFixedSalary("");
     }
+
     try {
       const response = await axios.post(
         "http://127.0.0.1:4000/api/v1/job/post",
-        fixedSalary.length >= 4
+        salaryType === "Fixed Salary"
           ? { title, description, category, country, city, location, fixedSalary }
           : { title, description, category, country, city, location, salaryFrom, salaryTo },
         {
@@ -53,24 +72,80 @@ const PostJob = () => {
           },
         }
       );
+
+      // Log the response data
+      console.log("Job posted successfully:", response.data);
+      
       toast.success(response.data.message);
+      navigateTo("/EmpHome");
     } catch (error) {
-      toast.error(error.response.data.message);
+      // Log the error response and message
+      console.error("Error posting job:", error);
+      toast.error(error.response?.data?.message || "An error occurred while posting the job.");
     }
   };
 
   return (
-    <>
-      <div className="job_post page">
-        <div className="container">
-          <h3>POST NEW JOB</h3>
-          <form onSubmit={handleJobPost}>
-            {/* Job post form inputs */}
-            {/* Submit button */}
-          </form>
-        </div>
+    <div className="job_post page">
+      <div className="container">
+        <h3>POST NEW JOB</h3>
+        <form onSubmit={handleJobPost}>
+          {/* Job post form inputs */}
+          <div>
+            <label>Title</label>
+            <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required />
+          </div>
+          <div>
+            <label>Description</label>
+            <textarea value={description} onChange={(e) => setDescription(e.target.value)} required />
+          </div>
+          <div>
+            <label>Category</label>
+            <input type="text" value={category} onChange={(e) => setCategory(e.target.value)} required />
+          </div>
+          <div>
+            <label>Country</label>
+            <input type="text" value={country} onChange={(e) => setCountry(e.target.value)} required />
+          </div>
+          <div>
+            <label>City</label>
+            <input type="text" value={city} onChange={(e) => setCity(e.target.value)} required />
+          </div>
+          <div>
+            <label>Location</label>
+            <input type="text" value={location} onChange={(e) => setLocation(e.target.value)} required />
+          </div>
+          <div>
+            <label>Salary Type</label>
+            <select value={salaryType} onChange={(e) => setSalaryType(e.target.value)} required>
+              <option value="default">Select Salary Type</option>
+              <option value="Fixed Salary">Fixed Salary</option>
+              <option value="Ranged Salary">Ranged Salary</option>
+            </select>
+          </div>
+          {salaryType === "Ranged Salary" && (
+            <>
+              <div>
+                <label>Salary From</label>
+                <input type="number" value={salaryFrom} onChange={(e) => setSalaryFrom(e.target.value)} required />
+              </div>
+              <div>
+                <label>Salary To</label>
+                <input type="number" value={salaryTo} onChange={(e) => setSalaryTo(e.target.value)} required />
+              </div>
+            </>
+          )}
+          {salaryType === "Fixed Salary" && (
+            <div>
+              <label>Fixed Salary</label>
+              <input type="number" value={fixedSalary} onChange={(e) => setFixedSalary(e.target.value)} required />
+            </div>
+          )}
+          <button type="submit">Post Job</button>
+          
+        </form>
       </div>
-    </>
+    </div>
   );
 };
 
