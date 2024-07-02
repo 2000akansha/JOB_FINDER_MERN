@@ -8,6 +8,7 @@ import { Link, Navigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { Context } from "../../main";
+import { sendSignInLinkToEmail, checkIfEmailExists } from "../../authService"; // Import correctly
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -16,11 +17,19 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("");
 
-  const { isAuthorized, setIsAuthorized, user, setUser } = useContext(Context);
+  const { isAuthorized, setIsAuthorized } = useContext(Context);
 
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
+      // Check if the email already exists
+      const emailExists = await checkIfEmailExists(email);
+      if (emailExists) {
+        toast.error("This email already exists. Please use a different email address.");
+        return;
+      }
+
+      // Proceed with registration
       const { data } = await axios.post(
         "http://127.0.0.1:4000/api/v1/user1/register1",
         { name, phone, email, role, password },
@@ -31,23 +40,34 @@ const Register = () => {
           withCredentials: true,
         }
       );
+
+      // Send verification link to email
+      await sendSignInLinkToEmail(email);
       toast.success(data.message);
+      toast.success("An email has been sent to your email address. Please click on the link to verify.");
+
+      // Clear the form fields
       setName("");
       setEmail("");
       setPassword("");
       setPhone("");
       setRole("");
-      setIsAuthorized(true);
+      
+      // User is not authorized until they verify their email
+      setIsAuthorized(false);
     } catch (error) {
-      toast.error(error.response.data.message);
+      if (error.response?.data?.message === "Email Invalid") {
+        toast.error("Email Invalid.");
+      } else {
+        toast.error(error.response?.data?.message || "An error occurred during registration.");
+      }
+      console.error('Registration error:', error);
     }
   };
 
-  if(isAuthorized){
-    return <Navigate to={'/EmpHome'}/>
+  if (isAuthorized) {
+    return <Navigate to={'/EmpHome'} />;
   }
-
-
   return (
     <>
       <section className="authPage">
@@ -119,7 +139,7 @@ const Register = () => {
             <button type="submit" onClick={handleRegister}>
               Register
             </button>
-            <Link to={"/login"}>Login Now</Link>
+            <Link to={"/login1"}>Login Now</Link>
           </form>
         </div>
         <div className="banner">
