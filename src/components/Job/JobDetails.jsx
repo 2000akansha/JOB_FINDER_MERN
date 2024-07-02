@@ -99,15 +99,17 @@ const JobDetails = () => {
               </span>
             )}
             </p>
-          {/* Adjusted brackets */}
-          {isAuthorized && role === "Job Seeker" && (
-            // Only show the link if the user is authorized and is a job seeker
+          {/* Adjusted brackets
+          {isAuthorized && role === "Job Seeker" && ( */}
+            {/* // Only show the link if the user is authorized and is a job seeker */}
             <Link to={`/application/${job._id}`}>Apply Now</Link>
-          )}
-          {isAuthorized && role !== "Job Seeker" && (
+            <Link to={'/JobseekerHome'}>Return To Home</Link>
+
+          {/* )} */}
+          {/* {isAuthorized && role !== "Job Seeker" && (
             // Only show the link if the user is authorized and is not a job seeker
             <Link to={'/EmpHome'}>Return To Home</Link>
-          )}
+          )} */}
         </div>
       </div>
     </section>
