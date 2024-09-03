@@ -2,7 +2,6 @@ import React, { createContext, useState } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.jsx";
 
-// Create a context with default values
 export const Context = createContext({
   isAuthorized: false,
   user: {},
